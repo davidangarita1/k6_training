@@ -24,6 +24,18 @@ export function orderPizza() {
 export function checkPizzaResponse(res) {
   return check(res, {
     'status is 200': (r) => r.status === 200,
+    'content-type is JSON': (r) => r.headers['Content-Type']?.includes('application/json'),
+    'response time < 1s': (r) => r.timings.duration < 1000,
     'has pizza name': (r) => r.status === 200 && r.json().pizza?.name !== '',
+    'ingredient count within bounds': (r) => {
+      if (r.status !== 200) return false;
+      const count = r.json().pizza?.ingredients?.length;
+      return count >= RESTRICTIONS.minNumberOfToppings && count <= RESTRICTIONS.maxNumberOfToppings;
+    },
+    'no excluded ingredients': (r) => {
+      if (r.status !== 200) return false;
+      const names = r.json().pizza?.ingredients?.map((i) => i.name?.toLowerCase()) ?? [];
+      return RESTRICTIONS.excludedIngredients.every((ex) => !names.includes(ex.toLowerCase()));
+    },
   });
 }
