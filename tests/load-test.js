@@ -31,10 +31,12 @@ export default function () {
   const res = orderPizza();
   checkPizzaResponse(res);
 
-  const pizza = res.json().pizza;
-  pizzaCount.add(1);
-  ingredientCount.add(pizza.ingredients.length);
-  console.log(`${pizza.name} (${pizza.ingredients.length} ingredients)`);
+  const pizza = res.json()?.pizza;
+  if (pizza) {
+    pizzaCount.add(1);
+    ingredientCount.add(pizza.ingredients.length);
+    console.log(`${pizza.name} (${pizza.ingredients.length} ingredients)`);
+  }
 
   sleep(1);
 }
