@@ -24,6 +24,6 @@ export function orderPizza() {
 export function checkPizzaResponse(res) {
   return check(res, {
     'status is 200': (r) => r.status === 200,
-    'has pizza name': (r) => r.json().pizza.name !== '',
+    'has pizza name': (r) => r.status === 200 && r.json().pizza?.name !== '',
   });
 }
