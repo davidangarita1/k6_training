@@ -4,6 +4,7 @@ import { orderPizza, checkPizzaResponse } from '../utils/helpers.js';
 export default function () {
   const res = orderPizza();
   checkPizzaResponse(res);
-  console.log(`Pizza: ${res.json().pizza.name}`);
+  const name = res.json()?.pizza?.name;
+  if (name) console.log(`Pizza: ${name}`);
   sleep(1);
 }
