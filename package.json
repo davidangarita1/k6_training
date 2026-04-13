@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test:example": "k6 run tests/example.js",
     "test:load": "k6 run tests/load-test.js",
     "test:stress": "k6 run tests/stress-test.js",
-    "test:example": "k6 run tests/example.js"
+    "test:all": "k6 run tests/all-tests.js"
   },
   "keywords": [],
   "author": "",
