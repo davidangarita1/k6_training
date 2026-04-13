@@ -1,78 +1,83 @@
-# k6 Training
+﻿# k6 Training
 
-A simple k6 load testing project.
+Performance tests for the [QuickPizza](https://quickpizza.grafana.com/) demo API by Grafana Labs.
 
-## Prerequisites
+## Requirements
 
-- [k6](https://grafana.com/docs/k6/latest/get-started/installation/) installed on your machine
-
-### Install k6
-
-**Windows (via Chocolatey):**
-```bash
-choco install k6
-```
-
-**Windows (via winget):**
-```bash
-winget install k6 --source winget
-```
-
-**macOS (via Homebrew):**
-```bash
-brew install k6
-```
-
-**Linux (Debian/Ubuntu):**
-```bash
-sudo gpg -k
-sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
-echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
-sudo apt-get update
-sudo apt-get install k6
-```
+Install k6: https://grafana.com/docs/k6/latest/get-started/installation/
 
 ## Project Structure
 
 ```
 k6_training/
 ├── tests/
-│   └── example.js   # Example load test script
-├── package.json
-└── README.md
+│   ├── example.js      # Basic single-VU script
+│   ├── load-test.js    # Ramps up to 10 VUs with custom metrics
+│   └── stress-test.js  # Spikes to 50 VUs to find limits
+├── utils/
+│   └── helpers.js      # Shared URL, headers, request helpers
+└── .env.example        # Environment variable reference
+```
+
+## Environment Variables
+
+| Variable    | Default                          | Description          |
+| ----------- | -------------------------------- | -------------------- |
+| `BASE_URL`  | `https://quickpizza.grafana.com` | Target API base URL  |
+| `API_TOKEN` | `abcdef0123456789`               | QuickPizza API token |
+
+```bash
+k6 run --env BASE_URL=https://quickpizza.grafana.com tests/load-test.js
 ```
 
 ## Running Tests
 
-### Run the example test
-
 ```bash
+# Example
 k6 run tests/example.js
+
+# Load test
+k6 run tests/load-test.js
+
+# Stress test
+k6 run tests/stress-test.js
 ```
 
-### Run with custom virtual users and duration
+Or use the package.json scripts:
 
 ```bash
-k6 run --vus 10 --duration 30s tests/example.js
+pnpm test:example
+pnpm test:load
+pnpm test:stress
 ```
 
-- `--vus`: Number of virtual users (default: 1)
-- `--duration`: Test duration (e.g. `30s`, `1m`, `5m`)
+## Common CLI Flags
 
-### Run with iterations
+| Flag           | Description                     | Example                   |
+| -------------- | ------------------------------- | ------------------------- |
+| `--vus`        | Number of virtual users         | `--vus 20`                |
+| `--duration`   | How long to run                 | `--duration 2m`           |
+| `--iterations` | Fixed total iterations          | `--iterations 100`        |
+| `--env`        | Pass an environment variable    | `--env BASE_URL=https://…` |
+| `--out`        | Export metrics (JSON, CSV, ...) | `--out json=results.json` |
+
+> CLI flags override options defined inside the script.
+
+### Examples
 
 ```bash
-k6 run --vus 5 --iterations 50 tests/example.js
+# 5 VUs for 30 seconds
+k6 run --vus 5 --duration 30s tests/example.js
+
+# 3 VUs, exactly 30 iterations total
+k6 run --vus 3 --iterations 30 tests/example.js
+
+# Save results to JSON
+k6 run --out json=results.json tests/load-test.js
 ```
-
-## What the Example Test Does
-
-The `tests/example.js` script sends a POST request to `https://httpbin.test.k6.io/post` and logs the HTTP response status code. It is intended as a starting point for building more complex load test scenarios.
 
 ## Development
 
-This project uses [`@types/k6`](https://www.npmjs.com/package/@types/k6) for TypeScript/IntelliSense support. Install dev dependencies with:
-
 ```bash
-pnpm install
+pnpm install   # installs @types/k6 for IntelliSense
 ```
